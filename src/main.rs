@@ -1,6 +1,6 @@
 use std::net::ToSocketAddrs;
 
-use color_eyre::eyre::{Context, Result};
+use color_eyre::eyre::{Context, Result, bail};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 struct Foo {
@@ -27,9 +27,9 @@ where
     ))?;
 
     // TODO log this instead
-    println!("Accepted connection at {}", addrs);
+    println!("accepted connection at {}", addrs);
 
-    let f: Foo = serde_json::from_reader(stream).context("Failed to read from stream")?;
+    let f: Foo = serde_json::from_reader(stream).context("failed to read from stream")?;
 
     let message = format!(
         "Hello {}, you are {} years old? That's ancient!",
@@ -71,8 +71,8 @@ fn main() -> Result<()> {
     let client_jh = std::thread::spawn(|| client(client_addr));
     let server_jh = std::thread::spawn(|| server(server_addr));
 
-    let _join = server_jh.join();
-    let _join2 = client_jh.join();
+    let () = server_jh.join().unwrap().context("server failed")?;
+    let () = client_jh.join().unwrap().context("client failed")?;
 
     Ok(())
 }
