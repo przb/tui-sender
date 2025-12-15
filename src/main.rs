@@ -2,15 +2,42 @@ mod app;
 mod client;
 mod msgs;
 mod server;
+mod args {
+    use std::path::PathBuf;
+
+    use clap::Parser;
+
+    #[derive(Parser, Debug)]
+    #[command(version, about)]
+    pub struct Args {
+        /// Directory containing message to pick from
+        #[arg(short, long)]
+        pub messages_dir: Option<PathBuf>,
+    }
+}
 mod ui;
 
+use clap::Parser;
 use color_eyre::eyre::{Context, Result};
+use itertools::Itertools;
 use std::sync::mpsc;
+use walkdir::WalkDir;
 
 fn main() -> Result<()> {
     color_eyre::install()?;
+    let args = args::Args::parse();
 
-    println!("Hello, world!");
+    let messages_dir = args.messages_dir.unwrap_or("messages".into());
+
+    let messages = WalkDir::new(messages_dir)
+        .follow_links(true)
+        .sort_by_file_name()
+        .into_iter()
+        .filter_entry(|e| e.file_type().is_file())
+        .filter_map(|e| e.ok().map(|entry| entry.into_path()))
+        .collect_vec();
+
+    println!("all messages: {messages:?}");
 
     let (ready_tx, ready_rx) = mpsc::channel();
     let client_addr = String::from("127.0.0.1:8888");
