@@ -1,6 +1,8 @@
+mod app;
 mod client;
 mod msgs;
 mod server;
+mod ui;
 
 use color_eyre::eyre::{Context, Result};
 use std::sync::mpsc;
