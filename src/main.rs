@@ -14,7 +14,7 @@ use std::sync::mpsc;
 use walkdir::WalkDir;
 
 use crate::app::{
-    MsgMetaData, client,
+    client,
     people_info::{Kilograms, Pet, PetType},
     server,
 };

@@ -1,21 +1,22 @@
-use std::path::{Path, PathBuf};
-
 pub mod client;
+pub mod meta;
 pub mod msgs;
 pub mod people_info;
 pub mod server;
 
-/// A struct that holds metadata bout the json messages
-pub struct MsgMetaData<T> {
-    pub msg: T,
-    pub path: PathBuf,
+pub enum AppStatus {
+    Sending,
+    WaitingResponse,
+    Idle,
+}
+pub struct App {
+    pub status: AppStatus,
 }
 
-impl<T> MsgMetaData<T> {
-    pub fn new<P: AsRef<Path>>(msg: T, path: P) -> Self {
+impl App {
+    pub fn new() -> Self {
         Self {
-            path: path.as_ref().into(),
-            msg,
+            status: AppStatus::Idle,
         }
     }
 }
