@@ -1,7 +1,4 @@
 mod app;
-mod client;
-mod msgs;
-mod server;
 mod args {
     use std::path::PathBuf;
 
@@ -22,6 +19,8 @@ use color_eyre::eyre::{Context, Result};
 use itertools::Itertools;
 use std::sync::mpsc;
 use walkdir::WalkDir;
+
+use crate::app::{client, server};
 
 fn main() -> Result<()> {
     color_eyre::install()?;

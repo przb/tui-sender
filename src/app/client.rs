@@ -5,7 +5,7 @@ use std::{
     sync::mpsc::Receiver,
 };
 
-use crate::msgs::{Foo, FooResponse};
+use crate::app::msgs::{Foo, FooResponse};
 
 pub fn client<A>(addr: A, read: Receiver<()>) -> Result<()>
 where

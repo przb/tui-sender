@@ -5,7 +5,7 @@ use std::{
     sync::mpsc::Sender,
 };
 
-use crate::msgs::{Foo, FooResponse};
+use crate::app::msgs::{Foo, FooResponse};
 
 pub fn server<A>(addr: A, ready: Sender<()>) -> Result<()>
 where
