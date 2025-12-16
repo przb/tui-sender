@@ -1,9 +1,9 @@
-use crate::app::people_info::Pet;
+use crate::app::people_info::{Person, Pet};
 
 #[derive(
     Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize, thiserror::Error,
 )]
-enum ResponseError {
+pub enum ResponseError {
     #[error("missing fields")]
     MissingFields,
 
@@ -19,7 +19,7 @@ pub struct GreetPerson {
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct GreetPersonResp {
-    pub message: String,
+    pub message: Result<String, ResponseError>,
 }
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -34,5 +34,5 @@ pub struct CreatePerson {
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct CreatePersonResp {
-    person: Person,
+    person: Result<Person, ResponseError>,
 }

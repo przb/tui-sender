@@ -5,7 +5,7 @@ use std::{
     sync::mpsc::Sender,
 };
 
-use crate::app::msgs::{GreetPerson, GreetPersonResp};
+use crate::app::msgs::{GreetPerson, GreetPersonResp, ResponseError};
 
 pub fn server<A>(addr: A, ready: Sender<()>) -> Result<()>
 where
@@ -40,11 +40,14 @@ where
 
     buf.clear();
 
-    let message = format!(
-        "Hello {}, you are {} years old? That's ancient!",
-        f.name, f.age
-    );
-
+    let message = if f.name.len() > 100 {
+        Err(ResponseError::FieldTooBig)
+    } else {
+        Ok(format!(
+            "Hello {}, you are {} years old? That's ancient!",
+            f.name, f.age
+        ))
+    };
     let response = GreetPersonResp { message };
 
     let res_bytes = serde_json::to_vec(&response).expect("failed to serialize response");
