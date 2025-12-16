@@ -5,27 +5,24 @@ pub mod msgs;
 #[expect(unused)]
 pub mod people_info;
 pub mod server;
+const LONG_TEXT: &str = "Omnis voluptas et nostrum maxime quia deleniti tempore. Iste blanditiis pariatur quaerat nulla nobis. Incidunt explicabo amet dolore sit accusamus. Neque non quidem ut dolorem est est iste laboriosam.";
 
 use std::{
     path::{Path, PathBuf},
     sync::mpsc,
 };
 
-use itertools::Itertools;
 use ratatui::{
     Terminal,
     crossterm::event::{self, KeyEvent},
     layout::{Constraint, Direction, Layout},
     prelude::{Backend, Stylize},
     style::Color,
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, Paragraph, Wrap},
 };
 use walkdir::WalkDir;
 
-use color_eyre::{
-    Handler,
-    eyre::{Context, Result},
-};
+use color_eyre::eyre::{Context, Result};
 
 #[expect(unused)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
@@ -102,8 +99,9 @@ impl App {
         frame.render_widget(&msg_list, outer_layout[0]);
 
         frame.render_widget(
-            Paragraph::new("some text")
-                .block(Block::new().bold().fg(Color::Blue).borders(Borders::ALL)),
+            Paragraph::new(LONG_TEXT)
+                .block(Block::new().bold().fg(Color::Blue).borders(Borders::ALL))
+                .wrap(Wrap { trim: false }),
             outer_layout[1],
         );
     }
