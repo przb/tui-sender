@@ -1,3 +1,5 @@
+#![expect(unused)]
+
 mod app;
 mod args {
     use std::path::PathBuf;
@@ -15,12 +17,19 @@ mod args {
 mod ui;
 
 use clap::Parser;
-use color_eyre::eyre::{Context, Result};
+use color_eyre::{
+    eyre::{Context, Result},
+    owo_colors::OwoColorize,
+};
 use itertools::Itertools;
 use std::sync::mpsc;
 use walkdir::WalkDir;
 
-use crate::app::{client, server};
+use crate::app::{
+    MsgMetaData, client,
+    people_info::{Kilograms, Pet, PetType},
+    server,
+};
 
 fn main() -> Result<()> {
     color_eyre::install()?;

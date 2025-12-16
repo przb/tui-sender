@@ -9,12 +9,18 @@ pub struct Person {
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct Kilograms(u16);
+impl Kilograms {
+    pub fn new(weight: u16) -> Self {
+        Self(weight)
+    }
+}
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct Pet {
+    pub name: String,
     pub weight: Kilograms,
     pub age: u8,
-    pub typ: PetType,
+    pub pet_type: PetType,
 }
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
