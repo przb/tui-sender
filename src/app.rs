@@ -6,7 +6,10 @@ pub mod msgs;
 pub mod people_info;
 pub mod server;
 
-use std::sync::mpsc;
+use std::{
+    path::{Path, PathBuf},
+    sync::mpsc,
+};
 
 use itertools::Itertools;
 use ratatui::{
@@ -34,37 +37,38 @@ pub enum AppStatus {
 
 pub struct App {
     pub status: AppStatus,
-    args: Args,
+    messages_dir: PathBuf,
+    paths: Vec<PathBuf>,
 }
 
+fn read_messages(messages_dir: impl AsRef<Path>) -> Vec<PathBuf> {
+    WalkDir::new(messages_dir)
+        .into_iter()
+        .flatten()
+        .filter_map(|e| e.file_type().is_file().then_some(e.into_path()))
+        .collect()
+}
 impl App {
     #[expect(unused)]
     pub fn new() -> Self {
         Self {
             status: AppStatus::Idle,
-            args: Args::default(),
+            messages_dir: PathBuf::default(),
+            paths: Vec::new(),
         }
     }
 
     pub(crate) fn from_args(args: crate::args::Args) -> Self {
+        let messages_dir = args.messages_dir.unwrap_or("messages".into());
         Self {
-            args,
+            paths: read_messages(&messages_dir),
+            messages_dir,
             status: AppStatus::Idle,
         }
     }
 
     #[expect(unused)]
     fn old_main(&self) -> Result<()> {
-        let messages_dir = self.args.messages_dir.clone().unwrap_or("messages".into());
-
-        let messages = WalkDir::new(messages_dir)
-            .into_iter()
-            .flatten()
-            .filter_map(|e| e.file_type().is_file().then_some(e.into_path()))
-            .collect_vec();
-
-        println!("all messages: {messages:?}");
-
         let (ready_tx, ready_rx) = mpsc::channel();
         let client_addr = String::from("127.0.0.1:8888");
         let server_addr = client_addr.clone();
@@ -96,11 +100,10 @@ impl App {
                 .block(Block::new().bold().fg(Color::Blue).borders(Borders::ALL)),
             outer_layout[0],
         );
-        frame.render_widget(
-            Paragraph::new("window 2")
-                .block(Block::new().bold().fg(Color::Green).borders(Borders::ALL)),
-            outer_layout[1],
-        );
+
+        let msg_list = crate::ui::MsgListWidget::new(self.paths.clone());
+
+        frame.render_widget(&msg_list, outer_layout[1]);
     }
     fn handle_events(&mut self) -> Result<()> {
         let event = event::read().context("failed to read event")?;
