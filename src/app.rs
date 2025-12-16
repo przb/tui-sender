@@ -18,7 +18,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout},
     prelude::{Backend, Stylize},
     style::Color,
-    widgets::{Block, Borders, Paragraph, Wrap},
+    widgets::{Block, Borders, ListState, Paragraph, Wrap},
 };
 use walkdir::WalkDir;
 
@@ -37,6 +37,8 @@ pub struct App {
     pub status: AppStatus,
     messages_dir: PathBuf,
     paths: Vec<PathBuf>,
+    /// index of the active message currently selected
+    active_msg_selection: usize,
 }
 
 fn read_messages(messages_dir: impl AsRef<Path>) -> Vec<PathBuf> {
@@ -53,6 +55,7 @@ impl App {
             status: AppStatus::Idle,
             messages_dir: PathBuf::default(),
             paths: Vec::new(),
+            active_msg_selection: 0,
         }
     }
 
@@ -62,6 +65,7 @@ impl App {
             paths: read_messages(&messages_dir),
             messages_dir,
             status: AppStatus::Idle,
+            active_msg_selection: 0,
         }
     }
 
@@ -94,9 +98,10 @@ impl App {
             .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
             .split(frame.area());
 
-        let msg_list = crate::ui::MsgListWidget::new(self.paths.clone());
+        let msg_list = crate::ui::MsgListWidget::new(self.paths.clone(), 0);
 
-        frame.render_widget(&msg_list, outer_layout[0]);
+        let mut state = ListState::default().with_selected(self.active_msg_selection.into());
+        frame.render_stateful_widget(&msg_list, outer_layout[0], &mut state);
 
         frame.render_widget(
             Paragraph::new(LONG_TEXT)
@@ -124,6 +129,20 @@ impl App {
             }
             event::KeyCode::Char('r') => {
                 self.paths = read_messages(&self.messages_dir);
+            }
+            event::KeyCode::Char('j') => {
+                self.active_msg_selection = if self.active_msg_selection >= self.paths.len() - 1 {
+                    0
+                } else {
+                    self.active_msg_selection + 1
+                };
+            }
+            event::KeyCode::Char('k') => {
+                self.active_msg_selection = if self.active_msg_selection <= 0 {
+                    self.paths.len() - 1
+                } else {
+                    self.active_msg_selection - 1
+                };
             }
             // do nothing
             _ => {}
