@@ -26,11 +26,9 @@ fn main() -> Result<()> {
     let messages_dir = args.messages_dir.unwrap_or("messages".into());
 
     let messages = WalkDir::new(messages_dir)
-        .follow_links(true)
-        .sort_by_file_name()
         .into_iter()
-        .filter_entry(|e| e.file_type().is_file())
-        .filter_map(|e| e.ok().map(|entry| entry.into_path()))
+        .flatten()
+        .filter_map(|e| e.file_type().is_file().then_some(e.into_path()))
         .collect_vec();
 
     println!("all messages: {messages:?}");
