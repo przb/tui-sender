@@ -1,47 +1,20 @@
-#![expect(unused)]
-
 mod app;
 mod args;
 mod ui;
 
 use clap::Parser;
-use color_eyre::{
-    eyre::{Context, Result},
-    owo_colors::OwoColorize,
-};
-use itertools::Itertools;
-use std::sync::mpsc;
-use walkdir::WalkDir;
+use color_eyre::Result;
 
-use crate::app::{
-    client,
-    people_info::{Kilograms, Pet, PetType},
-    server,
-};
+use crate::app::App;
 
 fn main() -> Result<()> {
     color_eyre::install()?;
+    let mut terminal = ratatui::init();
+
     let args = args::Args::parse();
 
-    let messages_dir = args.messages_dir.unwrap_or("messages".into());
+    let app_result = App::from_args(args).run(&mut terminal);
+    ratatui::restore();
 
-    let messages = WalkDir::new(messages_dir)
-        .into_iter()
-        .flatten()
-        .filter_map(|e| e.file_type().is_file().then_some(e.into_path()))
-        .collect_vec();
-
-    println!("all messages: {messages:?}");
-
-    let (ready_tx, ready_rx) = mpsc::channel();
-    let client_addr = String::from("127.0.0.1:8888");
-    let server_addr = client_addr.clone();
-
-    let client_jh = std::thread::spawn(|| client::client(client_addr, ready_rx));
-    let server_jh = std::thread::spawn(|| server::server(server_addr, ready_tx));
-
-    let () = server_jh.join().unwrap().context("server failure")?;
-    let () = client_jh.join().unwrap().context("client failed")?;
-
-    Ok(())
+    app_result
 }
