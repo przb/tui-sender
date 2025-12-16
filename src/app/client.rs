@@ -5,7 +5,7 @@ use std::{
     sync::mpsc::Receiver,
 };
 
-use crate::app::msgs::{Foo, FooResponse};
+use crate::app::msgs::{GreetPerson, GreetPersonResp};
 
 pub fn client<A>(addr: A, read: Receiver<()>) -> Result<()>
 where
@@ -17,7 +17,7 @@ where
         std::net::TcpStream::connect(addr).context("failed to connect to remote server")?;
     let mut buf = vec![0; 1_000];
 
-    let request = Foo {
+    let request = GreetPerson {
         name: "Oreo".into(),
         age: 1,
     };
@@ -31,7 +31,7 @@ where
         .read(&mut buf)
         .context("failed to read from stream")?;
 
-    let response: FooResponse = serde_json::from_slice(buf.get(0..num_read).unwrap())
+    let response: GreetPersonResp = serde_json::from_slice(buf.get(0..num_read).unwrap())
         .with_context(|| {
             format!(
                 "failed to deserialize response:\n{}",

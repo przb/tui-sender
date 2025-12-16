@@ -5,7 +5,7 @@ use std::{
     sync::mpsc::Sender,
 };
 
-use crate::app::msgs::{Foo, FooResponse};
+use crate::app::msgs::{GreetPerson, GreetPersonResp};
 
 pub fn server<A>(addr: A, ready: Sender<()>) -> Result<()>
 where
@@ -30,12 +30,13 @@ where
         .read(&mut buf)
         .context("failed to read from stream")?;
 
-    let f: Foo = serde_json::from_slice(&buf.get(0..num_read).unwrap()).with_context(|| {
-        format!(
-            "failed to deserialize data:\n{}",
-            String::from_utf8_lossy(&buf)
-        )
-    })?;
+    let f: GreetPerson =
+        serde_json::from_slice(&buf.get(0..num_read).unwrap()).with_context(|| {
+            format!(
+                "failed to deserialize data:\n{}",
+                String::from_utf8_lossy(&buf)
+            )
+        })?;
 
     buf.clear();
 
@@ -44,7 +45,7 @@ where
         f.name, f.age
     );
 
-    let response = FooResponse { message };
+    let response = GreetPersonResp { message };
 
     let res_bytes = serde_json::to_vec(&response).expect("failed to serialize response");
     let () = stream
