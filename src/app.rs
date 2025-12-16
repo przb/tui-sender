@@ -14,7 +14,7 @@ use std::{
 use itertools::Itertools;
 use ratatui::{
     Terminal,
-    crossterm::event,
+    crossterm::event::{self, KeyEvent},
     layout::{Constraint, Direction, Layout},
     prelude::{Backend, Stylize},
     style::Color,
@@ -22,9 +22,10 @@ use ratatui::{
 };
 use walkdir::WalkDir;
 
-use crate::args::Args;
-
-use color_eyre::eyre::{Context, Result};
+use color_eyre::{
+    Handler,
+    eyre::{Context, Result},
+};
 
 #[expect(unused)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
@@ -95,27 +96,40 @@ impl App {
             .margin(1)
             .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
             .split(frame.area());
-        frame.render_widget(
-            Paragraph::new("some text")
-                .block(Block::new().bold().fg(Color::Blue).borders(Borders::ALL)),
-            outer_layout[0],
-        );
 
         let msg_list = crate::ui::MsgListWidget::new(self.paths.clone());
 
-        frame.render_widget(&msg_list, outer_layout[1]);
+        frame.render_widget(&msg_list, outer_layout[0]);
+
+        frame.render_widget(
+            Paragraph::new("some text")
+                .block(Block::new().bold().fg(Color::Blue).borders(Borders::ALL)),
+            outer_layout[1],
+        );
     }
     fn handle_events(&mut self) -> Result<()> {
         let event = event::read().context("failed to read event")?;
         match event {
-            event::Event::Key(key_event) if matches!(key_event.code, event::KeyCode::Char('q')) => {
-                self.status = AppStatus::Exit;
-            }
+            event::Event::Key(key_event) => self.handle_key_event(key_event)?,
             _ => {
                 // do nothing
             }
         }
 
+        Ok(())
+    }
+
+    fn handle_key_event(&mut self, key_event: KeyEvent) -> Result<()> {
+        match key_event.code {
+            event::KeyCode::Char('q') => {
+                self.status = AppStatus::Exit;
+            }
+            event::KeyCode::Char('r') => {
+                self.paths = read_messages(&self.messages_dir);
+            }
+            // do nothing
+            _ => {}
+        }
         Ok(())
     }
 }
