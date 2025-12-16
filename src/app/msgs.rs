@@ -22,6 +22,7 @@ pub struct GreetPersonResp {
     pub message: Result<String, ResponseError>,
 }
 
+#[expect(unused)]
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct CreatePerson {
     name: String,
@@ -33,6 +34,7 @@ pub struct CreatePerson {
 }
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[expect(unused)]
 pub struct CreatePersonResp {
     person: Result<Person, ResponseError>,
 }

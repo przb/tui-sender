@@ -1,6 +1,8 @@
 pub mod client;
+#[expect(unused)]
 pub mod meta;
 pub mod msgs;
+#[expect(unused)]
 pub mod people_info;
 pub mod server;
 
@@ -21,6 +23,7 @@ use crate::args::Args;
 
 use color_eyre::eyre::{Context, Result};
 
+#[expect(unused)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum AppStatus {
     Sending,
@@ -28,12 +31,14 @@ pub enum AppStatus {
     Idle,
     Exit,
 }
+
 pub struct App {
     pub status: AppStatus,
     args: Args,
 }
 
 impl App {
+    #[expect(unused)]
     pub fn new() -> Self {
         Self {
             status: AppStatus::Idle,
@@ -48,6 +53,7 @@ impl App {
         }
     }
 
+    #[expect(unused)]
     fn old_main(&self) -> Result<()> {
         let messages_dir = self.args.messages_dir.clone().unwrap_or("messages".into());
 
