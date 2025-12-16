@@ -1,0 +1,10 @@
+{
+  "name": "Oreo",
+  "weight": 2,
+  "age": 3,
+  "pet_type": {
+    "Cat": {
+      "lives": 3
+    }
+  }
+}

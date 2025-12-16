@@ -1,0 +1,10 @@
+{
+  "name": "Orman",
+  "weight": 10,
+  "age": 6,
+  "pet_type": {
+    "Dog": {
+      "has_floppy_ears": true
+    }
+  }
+}

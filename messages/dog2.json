@@ -1,0 +1,10 @@
+{
+  "name": "DeeOhGee",
+  "weight": 11,
+  "age": 3,
+  "pet_type": {
+    "Dog": {
+      "has_floppy_ears": false
+    }
+  }
+}
