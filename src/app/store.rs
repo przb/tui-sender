@@ -5,7 +5,7 @@ use color_eyre::{Result, eyre::Context};
 use ratatui::{
     crossterm::event,
     prelude::*,
-    widgets::{Block, Borders, ListState, Paragraph, Wrap},
+    widgets::{Block, Borders, Paragraph, Wrap},
 };
 use walkdir::WalkDir;
 
@@ -26,7 +26,6 @@ fn read_messages(messages_dir: impl AsRef<Path>) -> Vec<PathBuf> {
         .collect()
 }
 
-#[expect(unused)]
 pub struct Store {
     status: AppStatus,
     msgs_dir: PathBuf,
@@ -64,10 +63,9 @@ impl Store {
             .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
             .split(frame.area());
 
-        let msg_list = crate::ui::MsgListWidget::new(self.msgs_list.clone(), 0);
+        let msg_list = crate::ui::MsgListWidget::new(&self.msgs_list, self.active_msg_selection);
 
-        let mut state = ListState::default().with_selected(self.active_msg_selection.into());
-        frame.render_stateful_widget(&msg_list, outer_layout[0], &mut state);
+        frame.render_stateful_widget(&msg_list, outer_layout[0], &mut msg_list.get_state());
 
         frame.render_widget(
             Paragraph::new(super::LONG_TEXT)

@@ -1,10 +1,12 @@
 mod actions;
+#[expect(unused)]
 pub mod client;
 #[expect(unused)]
 pub mod meta;
 pub mod msgs;
 #[expect(unused)]
 pub mod people_info;
+#[expect(unused)]
 pub mod server;
 mod store;
 

@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use ratatui::{
     buffer::Buffer,
@@ -7,24 +7,24 @@ use ratatui::{
     widgets::{Block, List, ListState, StatefulWidget},
 };
 
-pub struct MsgListWidget {
-    paths: Vec<PathBuf>,
-    selected: usize,
+pub struct MsgListWidget<'a> {
+    paths: &'a [PathBuf],
+    selected_index: usize,
 }
 
-impl MsgListWidget {
-    pub fn new(paths: impl IntoIterator<Item = impl AsRef<Path>>, selected_index: usize) -> Self {
+impl<'a, 'b> MsgListWidget<'a> {
+    pub fn new(paths: &'a [PathBuf], selected_index: usize) -> Self {
         Self {
-            paths: paths
-                .into_iter()
-                .map(|p| PathBuf::from(p.as_ref()))
-                .collect(),
-            selected: selected_index,
+            paths,
+            selected_index,
         }
+    }
+    pub fn get_state(&self) -> ListState {
+        ListState::default().with_selected(self.selected_index.into())
     }
 }
 
-impl StatefulWidget for &MsgListWidget {
+impl StatefulWidget for &MsgListWidget<'_> {
     type State = ListState;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State)
